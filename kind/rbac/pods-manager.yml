@@ -1,0 +1,38 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: pods-manager
+rules:
+- apiGroups: ["rbac.authorization.k8s.io"]
+  resources: ["pods"]
+  verbs: ["get", "watch", "list", "update", "delete", "create", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: pods-manager-binding
+subjects:
+- kind: Group
+  name: infrastructure:default
+  #namespace: default
+  apiGroup: rbac.authorization.k8s.io  
+roleRef:
+  kind: ClusterRole
+  name: pods-manager
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: pods-manager-kubesystem-binding
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: kube-system
+roleRef:
+  kind: ClusterRole
+  name: pods-manager
+  apiGroup: rbac.authorization.k8s.io
+
+# kubectl create clusterrole "pods-manager" --verb=get,watch,list,update,delete,create,patch --resource=pods
+# kubectl create clusterrolebinding pods-manager-binding --clusterrole=pods-manager --serviceaccount=default:default
